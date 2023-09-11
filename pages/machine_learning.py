@@ -10,7 +10,7 @@ MODEL_PATH = "./assets/model.pkl"
 JA2EN = {
        "sex":{
               
-              "男性":"male",
+              "男":"male",
               "女":"female"},
        "smoker":{
               "する":"yes",
