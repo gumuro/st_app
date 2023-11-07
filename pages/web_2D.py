@@ -5,6 +5,16 @@ from sklearn.cluster import KMeans
 import streamlit as st
 import xlsxwriter
 import io
+st.markdown("""
+    <style>
+    .big-font {
+        font-size:30px !important;
+        text-align: center !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.markdown('<p class="big-font"></p>', unsafe_allow_html=True)
 
 st.title("NTT Com DD株式会社_来場者の情報")
 st.write("")
