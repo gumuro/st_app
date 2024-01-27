@@ -8,7 +8,7 @@ st.write("")
 st.subheader("自社製品と類似度分布")
 
 # 读取数据
-data = pd.read_excel('自社製品と類似度分布.xlsx')
+data = pd.read_excel('cos_with_describe_end.xlsx')
 
 # 过滤出 Tufinと類似度 不是 0% 的数据
 filtered_data_tufin = data[data['Tufinと類似度'] > 0]
@@ -59,3 +59,13 @@ with col1:
 # 在右侧列显示 Managed 相似度热图
 with col2:
     st.plotly_chart(fig_managed)
+    
+# 新的标题
+st.subheader("自社製品の関連性")
+
+# 显示 network.png 图像
+st.image("network.png", caption="自社製品の関連性ネットワーク")
+
+# 添加描述文字
+st.write("自社製品との相関が高いほどつながりが太くなり、協力できる企業を見つけたり、今回展示した製品の市場分野を分布したりするのに役立ちます。")
+
