@@ -37,8 +37,8 @@ def load_data():
 data = load_data()
 
 # 计算汇总数据
-visitors_per_product = data.groupby('製品')['来場者ID'].count().reset_index()
-total_visitors = visitors_per_product['来場者ID'].sum()
+visitors_per_product = data.groupby('製品')['AiTag ID'].count().reset_index()
+total_visitors = visitors_per_product['AiTag ID'].sum()
 visit_count_per_product = data.groupby('製品')['訪問回数'].sum().reset_index()
 download_count_per_product = data.groupby('製品')['ダウンロード回数'].sum().reset_index()
 email_forward_count_per_product = data.groupby('製品')['メール転送回数'].sum().reset_index()
