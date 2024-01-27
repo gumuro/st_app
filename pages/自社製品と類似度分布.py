@@ -11,7 +11,7 @@ st.subheader("自社製品と類似度分布")
 # 公共的数据处理函数
 def process_data(filename, columns):
     data = pd.read_excel(filename)
-    data_one = data[columns].copy()
+    data = data[columns].copy()
     return data
 
 data = process_data('cos_with_describe_end.xlsx')
