@@ -66,7 +66,7 @@ def plot_horizontal_bar_chart(data, title, x_label, y_label, ax=None):
 
 
 # 设置页面布局
-st.title("NTT Com DD株式会社 基本統計情報")
+st.title("NTT Com DD株式会社 基本情報")
 
 
 
