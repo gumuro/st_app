@@ -71,7 +71,7 @@ with col2:
 st.subheader("自社製品の関連性")
 
 # 显示 network.png 图像
-st.image("network.png", caption="自社製品の関連性ネットワーク")
+st.image("network.png")
 
 # 添加描述文字
 st.write("自社製品との相関が高いほどつながりが太くなり、協力できる企業を見つけたり、今回展示した製品の市場分野を分布したりするのに役立ちます。")
