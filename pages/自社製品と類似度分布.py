@@ -8,7 +8,13 @@ st.write("")
 st.subheader("自社製品と類似度分布")
 
 # 读取数据
-data = pd.read_excel('cos_with_describe_end.xlsx')
+# 公共的数据处理函数
+def process_data(filename, columns):
+    data = pd.read_excel(filename)
+    data_one = data[columns].copy()
+    return data
+
+data = process_data('cos_with_describe_end.xlsx')
 
 # 过滤出 Tufinと類似度 不是 0% 的数据
 filtered_data_tufin = data[data['Tufinと類似度'] > 0]
