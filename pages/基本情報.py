@@ -25,16 +25,19 @@ def plot_hourly_visitor_distribution(product_data, product_name, unique_dates):
     return plt
 
 # 加载数据
-@st.cache_data
-def load_data():
-    data = pd.read_excel('NTT Com DD株式会社.xlsx',['出展社ID','出展社名','製品','AiTag ID','来場者ID','関心度','スキャン/AiBoxタッチ日時','ダウンロード回数','メール転送回数','訪問回数'])
+def process_data(filename, columns):
+    data_one = pd.read_excel(filename)
+    data = data_one[columns].copy()
+    data['関心度'] = data['関心度'].apply(lambda x: int(x) if x.isdigit() else 0)
+    data['訪問回数'] = data.groupby('AiTag ID')['AiTag ID'].transform('count')
     data['スキャン/AiBoxタッチ日時'] = pd.to_datetime(data['スキャン/AiBoxタッチ日時'], errors='coerce')
     # 移除含有NaT的行
     data = data.dropna(subset=['スキャン/AiBoxタッチ日時'])
     data['date'] = data['スキャン/AiBoxタッチ日時'].dt.date
     data['hour'] = data['スキャン/AiBoxタッチ日時'].dt.hour
     return data
-data = load_data()
+data = process_data('NTT Com DD株式会社.xlsx', ['出展社名', '製品','AiTag ID', '関心度','スキャン/AiBoxタッチ日時', 'ダウンロード回数', 'メール転送回数'])
+
 
 # 计算汇总数据
 visitors_per_product = data.groupby('製品')['AiTag ID'].count().reset_index()
