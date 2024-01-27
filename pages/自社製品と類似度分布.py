@@ -14,7 +14,8 @@ def process_data(filename, columns):
     data = data[columns].copy()
     return data
 
-data = process_data('cos_with_describe_end.xlsx')
+data = process_data('cos_with_describe_end.xlsx',['出展社名','製品','Tufinと類似度','Managedと類似度','人気度'])
+
 
 # 过滤出 Tufinと類似度 不是 0% 的数据
 filtered_data_tufin = data[data['Tufinと類似度'] > 0]
