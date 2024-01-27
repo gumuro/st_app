@@ -27,7 +27,7 @@ def plot_hourly_visitor_distribution(product_data, product_name, unique_dates):
 # 加载数据
 @st.cache_data
 def load_data():
-    data = pd.read_excel('NTT Com DD株式会社.xlsx')
+    data = pd.read_excel('NTT Com DD株式会社.xlsx',['出展社ID','出展社名','製品','AiTag ID','来場者ID','関心度','スキャン/AiBoxタッチ日時','ダウンロード回数','メール転送回数','訪問回数'])
     data['スキャン/AiBoxタッチ日時'] = pd.to_datetime(data['スキャン/AiBoxタッチ日時'], errors='coerce')
     # 移除含有NaT的行
     data = data.dropna(subset=['スキャン/AiBoxタッチ日時'])
