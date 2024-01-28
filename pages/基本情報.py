@@ -46,7 +46,47 @@ visit_count_per_product = data.groupby('製品')['訪問回数'].sum().reset_ind
 download_count_per_product = data.groupby('製品')['ダウンロード回数'].sum().reset_index()
 email_forward_count_per_product = data.groupby('製品')['メール転送回数'].sum().reset_index()
 
+# 读取alldata.xlsx文件
+alldata = process_data('alldata.xlsx',['出展社名', '製品','AiTag ID', '関心度','スキャン/AiBoxタッチ日時', 'ダウンロード回数', 'メール転送回数'])
 
+# 计算总来访者数量
+total_visitors = alldata['AiTag ID'].nunique()
+
+# 计算NTT Com DD株式会社的来访者数量
+ntt_com_visitors = alldata[alldata['出展社名'] == 'NTT Com DD株式会社']['AiTag ID'].nunique()
+
+    
+# 修改后的绘制圆形图的函数，调整图例位置
+def plot_visitor_circles(total, ntt_com):
+    # 大圆半径
+    radius_large = 3  # 可以根据需要调整这个值
+    # 小圆半径，根据比例计算
+    radius_small = radius_large * (ntt_com / total) ** 0.5
+
+    # 创建图形和坐标轴
+    fig, ax = plt.subplots()
+    # 绘制大圆
+    large_circle = plt.Circle((0, 0), radius_large, color='blue', alpha=0.5, label=f'Total Visitors: {total}')
+    ax.add_artist(large_circle)
+    # 绘制小圆
+    small_circle = plt.Circle((0, -radius_large + radius_small), radius_small, color='red', alpha=0.5, label=f'NTT Com Visitors: {ntt_com}')
+    ax.add_artist(small_circle)
+
+    # 设置坐标轴范围，确保图形居中显示
+    ax.set_xlim(-radius_large, radius_large)
+    ax.set_ylim(-radius_large, radius_large)
+    ax.set_aspect('equal', adjustable='box')  # 保持等比例
+
+    # 隐藏坐标轴
+    ax.axis('off')
+
+    # 添加图例，位置在右上角
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+    # 使用Streamlit的pyplot方法显示图形
+    st.pyplot(fig)
+
+    
 # 新增的绘图函数
 def plot_horizontal_bar_chart(data, title, x_label, y_label, ax=None):
     if ax is None:
@@ -77,63 +117,89 @@ st.title("NTT Com DD株式会社 基本情報")
 
 st.header("")
 st.header("")
-st.markdown("<h4>来場者の総数</h4>", unsafe_allow_html=True)
-st.write(f"来場者の総数：{total_visitors}")
+st.markdown("<h4>当社の来場者人数と来場者総数</h4>", unsafe_allow_html=True)
+# 新增的部分
+
+
+# 在Streamlit应用中调用函数绘制并显示图形
+plot_visitor_circles(total_visitors, ntt_com_visitors)
+
 
 st.header("")
-# 使用st.markdown设置不同字体大小
-st.markdown("<h4>製品ごとの来場者人数</h4>", unsafe_allow_html=True)  # 设置字体大小为 h4，标题为日语
-view_data = data.groupby('製品').size()
-fig, ax = plot_horizontal_bar_chart(view_data, "製品ごとの閲覧数", "閲覧数", "製品")
-st.pyplot(fig)
-
-st.table(visitors_per_product)
-
-
 st.header("")
 # 来场者时间分布图
+# 使用实际的文件名和列名调用process_data函数
+
+
+
+# 使用单选按钮选择要显示的图表类型
 st.markdown("<h4>来場者人数の時間分布</h4>", unsafe_allow_html=True)
-unique_dates = data['date'].unique()
-unique_dates.sort()
-for product in visitors_per_product['製品']:
-    product_data = data[data['製品'] == product]
-    plt = plot_hourly_visitor_distribution(product_data, product, unique_dates)
-    st.pyplot(plt)
+chart_option = st.radio(
+    "",
+    ('当社来場者人数と来場者総数の時系列', '日別来場者人数の時系列')
+)
+
+# 根据所选的单选按钮显示不同的图表
+if chart_option == '当社来場者人数と来場者総数の時系列':
+    # 调用绘制堆叠区域图的函数
+    # 显示 network.png 图像
+    st.image("614.png", caption="  ")
+    st.image("615.png", caption="  ")
+    st.image("616.png", caption="  ")
+    
+elif chart_option == '日別来場者人数の時系列':
+    # 来场者时间分布图
+    st.markdown("<h4>来場者人数の時間分布</h4>", unsafe_allow_html=True)
+    unique_dates = data['date'].unique()
+    unique_dates.sort()
+    for product in visitors_per_product['製品']:
+        product_data = data[data['製品'] == product]
+        plt = plot_hourly_visitor_distribution(product_data, product, unique_dates)
+        st.pyplot(plt)
+        
 
 
 
 st.header("")
-st.markdown("<h4>製品ごとの訪問回数</h4>", unsafe_allow_html=True)  # 设置字体大小为 h4，标题为日语
-fig, ax = plot_horizontal_bar_chart(visit_count_per_product.set_index('製品')['訪問回数'], 
-                                    "製品ごとの訪問回数", "訪問回数", "製品")
-
-st.pyplot(fig)
-st.table(download_count_per_product)
-
-
 st.header("")
 st.markdown("<h4>製品ごとのダウンロード数</h4>", unsafe_allow_html=True)  # 设置字体大小为 h4，标题为日语
 fig, ax = plot_horizontal_bar_chart(download_count_per_product.set_index('製品')['ダウンロード回数'], 
                                     "製品ごとのダウンロード数", "ダウンロード数", "製品")
 st.pyplot(fig)
-st.table(download_count_per_product)
 
 
+st.header("")
 st.header("")
 st.markdown("<h4>製品ごとのメール転送数</h4>", unsafe_allow_html=True)  # 设置字体大小为 h4，标题为日语
 fig, ax = plot_horizontal_bar_chart(email_forward_count_per_product.set_index('製品')['メール転送回数'], 
                                     "製品ごとのメール転送数", "メール転送数", "製品")
 st.pyplot(fig)
-st.table(email_forward_count_per_product)
+
 
 st.header("")
 # 使用st.markdown设置不同字体大小
 st.markdown("<h4>来場者の関心度</h4>", unsafe_allow_html=True)  # 设置字体大小为 h4，标题为日语
 
-# 来场者的关心度分布
-interest_level_counts = data['関心度'].value_counts()
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.pie(interest_level_counts, labels=interest_level_counts.index, autopct='%1.1f%%', startangle=10)
+# 为每个产品绘制关心度分布图
+unique_products = data['製品'].unique()
 
-st.pyplot(fig)
+# 设置子图布局，每行显示两个饼图
+cols = st.columns(2)
+for index, product in enumerate(unique_products):
+    # 筛选特定产品的数据
+    product_data = data[data['製品'] == product]
+    # 计算该产品的关心度分布
+    interest_level_counts = product_data['関心度'].value_counts()
+
+    # 创建一个固定大小的饼图
+    fig, ax = plt.subplots(figsize=(4, 4))  # 这里可以调整饼图的大小
+    ax.pie(interest_level_counts, labels=interest_level_counts.index, autopct='%1.1f%%', startangle=20)
+    ax.set_title(product)
+
+    # 保持宽高比例一致
+    ax.set_aspect('equal')
+
+    # 在Streamlit的布局中显示饼图
+    with cols[index % 2]:
+        st.pyplot(fig)
 
