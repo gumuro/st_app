@@ -1,79 +1,49 @@
 import streamlit as st
-import json
 import requests
-import time
 
+# 将这里的YOUR_API_TOKEN替换为您的Hugging Face API令牌
+API_TOKEN = "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"
+MODEL = "gpt2"  # 或者您想使用的任何其他模型
 
-MODEL = "facebook/blenderbot-400M-distill"
-credentials_dict = json.loads(st.secrets["hugging_face"])
-API_TOKEN = credentials_dict["access_token"]
+# 设置Hugging Face API的URL
+api_url = f"https://api-inference.huggingface.co/models/{MODEL}"
 
+headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
-# Huggin Face とのインターフェース
-class HuggingFace():
+def query(model_input):
+    """发送请求到Hugging Face模型API"""
+    payload = {
+        "inputs": model_input
+    }
+    response = requests.post(api_url, headers=headers, json=payload)
+    return response.json()
 
+st.set_page_config(page_title="ChatGPT ", layout="wide")
+st.title("Chatbot")
 
-    def __init__(self, model_path, token):
-        self.model_path = model_path
-        self.api_url = f"https://api-inference.huggingface.co/models/{model_path}"
-        self.headers = {"Authorization": f"Bearer {token}"}
+user_input = st.text_input("You:", key="user_input")
 
+if user_input:
+    # 发送用户输入到ChatGPT模型
+    response = query(user_input)
+    # 显示模型的回复
+    if response:
+        # 检查响应格式并提取生成的文本
+        generated_text = response[0].get('generated_text', "") if isinstance(response, list) else response.get('generated_text', "")
+        if generated_text:
+            # 创建列以显示头像和文本
+            col1, col2 = st.columns([1, 5])
+            with col1:
+                st.image("user_avatar.png", width=50)  # 确保你有一个用户头像文件
+            with col2:
+                st.write(f"You: {user_input}")
 
-    # API通信の基本メソッド
-    def query(self, payload):
-        data = json.dumps(payload)
-        response = requests.request("POST", self.api_url, headers=self.headers, data=data)
-        return response
-
-
-    # APIの稼働状況の確認
-    def check_status(self):
-        data = self.query({"inputs":""})
-        return data.status_code
-
-
-    # APIにテキストを送り、稼働を待ってレスポンスを受け取る
-    def inference(self, inputs, parameters={}, options={}, timeout=100):
-        i = 0
-        # API の稼働状況を3秒ごとに確認
-        while self.check_status() == 503 and i*3 < timeout:
-            if i == 0:
-                print("アプリの立ち上げを待っています")
-            time.sleep(3)
-            i += 1
-        # APIにテキストを送信
-        print("推論結果の取得をしています")
-        payload = {"inputs":inputs, "parameters":parameters, "options":options}
-        data = self.query(payload)
-        print("終了")
-        # レスポンスのJSONデータを辞書型に変換
-        result = json.loads(data.content)
-        return result
-
-
-# インターフェースのインスタンス化
-bot = HuggingFace(MODEL, API_TOKEN)
-# 会話ログの初期化
-if "log" not in st.session_state:
-    st.session_state["log"] = []
-
-
-# ユーザーの入力
-message = st.chat_input("Say something")
-if message:
-    # ユーザー入力の会話ログへの追加
-    post = {"name":"user", "message":message}
-    st.session_state["log"].append(post)
-
-
-    # インターフェースからの返答
-    response = bot.inference(message)["generated_text"]
-    # インターフェースからの返答の会話ログへの追加
-    post = {"name":"assistant", "message":response}
-    st.session_state["log"].append(post)
-
-
-    # 会話ログの表示
-    for post in st.session_state["log"]:
-        with st.chat_message(post["name"]):
-            st.write(post["message"])
+            col1, col2 = st.columns([1, 5])
+            with col1:
+                st.image("chatgpt_avatar.png", width=50)  # 确保你有一个ChatGPT头像文件
+            with col2:
+                st.write(f"chatbot: {generated_text}")
+        else:
+            st.error("Error getting response from the model.")
+    else:
+        st.error("Received no response from the model.")
