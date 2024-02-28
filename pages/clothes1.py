@@ -120,9 +120,9 @@ average_wind_speed = weather_data['wind']['speed']
 sensible_temperature = weather_data['main']['feels_like']
 
 # 加载模型和标签编码器
-model_path = 'C:/1作品/picture_myclothes/random_forest_classifier.joblib'
+model_path = 'C:/twoyear/クラウドコンピューティング応用/st_app/pages/random_forest_classifier.joblib'
 model = load(model_path)
-season_encoder = joblib.load('C:/1作品/picture_myclothes/season_encoder.joblib')
+season_encoder = joblib.load('C:/twoyear/クラウドコンピューティング応用/st_app/pages/season_encoder.joblib')
 
 # 使用标签编码器转换新的输入数据
 season_encoded = season_encoder.transform([season])
@@ -170,7 +170,7 @@ st.markdown(f"""
 #st.write(f"Clothing advice for today: {clothing_advice[0]}")
 
 
-clothes_df = pd.read_excel('C:/1作品/picture_myclothes/clothes.xlsx')
+clothes_df = pd.read_excel('C:/twoyear/クラウドコンピューティング応用/st_app/pages/clothes.xlsx')
       
 unique_clothing_types = set(clothing_advice_list)
 
